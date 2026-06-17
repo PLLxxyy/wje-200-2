@@ -17,13 +17,19 @@ function RecordList({ records, onDelete, onEdit }: Props) {
     );
   }
 
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>, r: GiftRecord) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('.delete-btn')) return;
+    onEdit(r);
+  };
+
   return (
     <div className="record-list">
       {records.map(r => (
         <div
           className="record-card"
           key={r.id}
-          onClick={() => onEdit(r)}
+          onClick={e => handleCardClick(e, r)}
           title="点击编辑"
         >
           <div className={`icon ${r.type === 'give' ? 'icon-give' : 'icon-receive'}`}>
@@ -46,9 +52,11 @@ function RecordList({ records, onDelete, onEdit }: Props) {
             className="delete-btn"
             onClick={e => {
               e.stopPropagation();
+              e.preventDefault();
               onDelete(r.id);
             }}
             title="删除"
+            type="button"
           >
             {'✕'}
           </button>
