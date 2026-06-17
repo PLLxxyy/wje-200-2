@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { GiftRecord, Occasion } from './types';
-import { loadRecords, addRecord, deleteRecord } from './utils/storage';
+import { loadRecords, addRecord, updateRecord, deleteRecord } from './utils/storage';
 import RecordList from './components/RecordList';
 import RecordForm from './components/RecordForm';
 import Statistics from './components/Statistics';
@@ -11,6 +11,7 @@ function App() {
   const [page, setPage] = useState<Page>('list');
   const [records, setRecords] = useState<GiftRecord[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<GiftRecord | null>(null);
   const [search, setSearch] = useState('');
   const [filterOccasion, setFilterOccasion] = useState<Occasion | ''>('');
   const [showFilter, setShowFilter] = useState(false);
@@ -23,6 +24,12 @@ function App() {
     const updated = addRecord(record);
     setRecords(updated);
     setShowForm(false);
+  }, []);
+
+  const handleUpdate = useCallback((record: GiftRecord) => {
+    const updated = updateRecord(record);
+    setRecords(updated);
+    setEditingRecord(null);
   }, []);
 
   const handleDelete = useCallback((id: string) => {
@@ -75,7 +82,7 @@ function App() {
             />
           )}
 
-          <RecordList records={filtered} onDelete={handleDelete} />
+          <RecordList records={filtered} onDelete={handleDelete} onEdit={setEditingRecord} />
 
           <button className="fab" onClick={() => setShowForm(true)} aria-label="新增记录">
             +
@@ -98,6 +105,14 @@ function App() {
 
       {showForm && (
         <RecordForm onAdd={handleAdd} onClose={() => setShowForm(false)} />
+      )}
+
+      {editingRecord && (
+        <RecordForm
+          editingRecord={editingRecord}
+          onUpdate={handleUpdate}
+          onClose={() => setEditingRecord(null)}
+        />
       )}
 
       <nav className="bottom-nav">

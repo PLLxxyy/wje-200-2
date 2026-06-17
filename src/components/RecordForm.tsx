@@ -3,38 +3,47 @@ import { GiftRecord, Occasion, OCCASIONS, OCCASION_ICONS } from '../types';
 import { generateId } from '../utils/storage';
 
 interface Props {
-  onAdd: (record: GiftRecord) => void;
+  onAdd?: (record: GiftRecord) => void;
+  onUpdate?: (record: GiftRecord) => void;
   onClose: () => void;
+  editingRecord?: GiftRecord;
 }
 
-function RecordForm({ onAdd, onClose }: Props) {
-  const [name, setName] = useState('');
-  const [type, setType] = useState<'give' | 'receive'>('give');
-  const [occasion, setOccasion] = useState<Occasion>('婚礼');
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [note, setNote] = useState('');
+function RecordForm({ onAdd, onUpdate, onClose, editingRecord }: Props) {
+  const [name, setName] = useState(editingRecord?.name ?? '');
+  const [type, setType] = useState<'give' | 'receive'>(editingRecord?.type ?? 'give');
+  const [occasion, setOccasion] = useState<Occasion>(editingRecord?.occasion ?? '婚礼');
+  const [amount, setAmount] = useState(editingRecord ? String(editingRecord.amount) : '');
+  const [date, setDate] = useState(editingRecord?.date ?? new Date().toISOString().slice(0, 10));
+  const [note, setNote] = useState(editingRecord?.note ?? '');
+
+  const isEditing = !!editingRecord;
 
   const canSubmit = !!(name.trim() && amount && Number(amount) > 0 && date);
 
   const handleSubmit = () => {
     if (!canSubmit) return;
-    onAdd({
-      id: generateId(),
+    const record: GiftRecord = {
+      id: editingRecord?.id ?? generateId(),
       name: name.trim(),
       occasion,
       amount: Number(amount),
       date,
       type,
       note: note.trim() || undefined,
-    });
+    };
+    if (isEditing) {
+      onUpdate?.(record);
+    } else {
+      onAdd?.(record);
+    }
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>新增记录</h2>
+          <h2>{isEditing ? '编辑记录' : '新增记录'}</h2>
           <button className="modal-close" onClick={onClose}>{'✕'}</button>
         </div>
 

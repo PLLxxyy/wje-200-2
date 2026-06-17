@@ -23,6 +23,16 @@ export function addRecord(record: GiftRecord): GiftRecord[] {
   return records;
 }
 
+export function updateRecord(record: GiftRecord): GiftRecord[] {
+  const records = loadRecords();
+  const index = records.findIndex(r => r.id === record.id);
+  if (index !== -1) {
+    records[index] = record;
+    saveRecords(records);
+  }
+  return records;
+}
+
 export function deleteRecord(id: string): GiftRecord[] {
   const records = loadRecords().filter(r => r.id !== id);
   saveRecords(records);

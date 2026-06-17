@@ -3,9 +3,10 @@ import { GiftRecord, OCCASION_ICONS } from '../types';
 interface Props {
   records: GiftRecord[];
   onDelete: (id: string) => void;
+  onEdit: (record: GiftRecord) => void;
 }
 
-function RecordList({ records, onDelete }: Props) {
+function RecordList({ records, onDelete, onEdit }: Props) {
   if (records.length === 0) {
     return (
       <div className="empty-state">
@@ -19,7 +20,12 @@ function RecordList({ records, onDelete }: Props) {
   return (
     <div className="record-list">
       {records.map(r => (
-        <div className="record-card" key={r.id}>
+        <div
+          className="record-card"
+          key={r.id}
+          onClick={() => onEdit(r)}
+          title="点击编辑"
+        >
           <div className={`icon ${r.type === 'give' ? 'icon-give' : 'icon-receive'}`}>
             {OCCASION_ICONS[r.occasion]}
           </div>
